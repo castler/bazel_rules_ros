@@ -1,14 +1,17 @@
-cc_library(
-    name = "builtin_std_msgs",
-    hdrs = [":generate_header_h"] + glob(["include/**/*.h"]),
-    strip_include_prefix = "include",
-    visibility = ["//visibility:public"],
+load("@bazel_ros//tools/ros:message_generation.bzl", "generate_messages")
+
+package(
+    default_visibility = ["//visibility:public"],
 )
 
-genrule(
+cc_library(
+    name = "builtin_std_msgs",
+    hdrs = glob(["include/**/*.h"]),
+    deps = [":generate_header_h"]
+)
+
+generate_messages(
     name = "generate_header_h",
-    srcs = ["msg/Header.msg"],
-    outs = ["std_msgs/Header.h"],
-    cmd = "echo $(location @gencpp//:gencpp)",
-    tools = ["@gencpp//:gencpp"],
+    srcs = glob(["msg/*.msg"]),
+    ros_package_name = "std_msgs",
 )

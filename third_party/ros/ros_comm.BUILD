@@ -1,3 +1,5 @@
+load("@bazel_ros//tools/ros:message_generation.bzl", "generate_messages")
+
 # Depends on roscpp_core
 cc_library(
     name = "roscpp",
@@ -14,6 +16,8 @@ cc_library(
         "@roscpp_core//:roscpp_core",
         "@boost//:thread",
         "@boost//:scope_exit",
+        "@ros_comm_msgs//:builtin_ros_comm_msgs",
+        ":builtin_ros_comm_msgs_whatever"
     ],
     visibility = ["//visibility:public"],
 )
@@ -57,4 +61,10 @@ genrule(
                -e 's/#cmakedefine HAVE_TRUNC//g' \
                -e 's/#cmakedefine HAVE_EPOLL//g' \
                $(SRCS) > $(OUTS)"
+)
+
+generate_messages(
+    name = "builtin_ros_comm_msgs_whatever",
+    srcs = glob(["clients/roscpp/msg/*.msg"]),
+    ros_package_name = "roscpp",
 )

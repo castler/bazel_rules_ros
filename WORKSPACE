@@ -24,8 +24,10 @@ new_http_archive(
     build_file = "third_party/ros/ros_comm.BUILD",
 )
 
+# Cannot name it genmsg because of
+# https://stackoverflow.com/questions/43862604/how-to-use-bazels-py-library-imports-argument
 new_http_archive(
-    name = "genmsg",
+    name = "genmsg_archive",
     strip_prefix = "genmsg-0bfdc5acf26fc2ab5cf085acf53d3f417706d38e",
     urls = ["https://github.com/ros/genmsg/archive/0bfdc5acf26fc2ab5cf085acf53d3f417706d38e.tar.gz"],
     sha256 = "8d9eb6653b142b3097e94e59a068e0acd4972110b2be3d2f74dc15255a146fda",
@@ -33,7 +35,7 @@ new_http_archive(
 )
 
 new_http_archive(
-    name = "gencpp",
+    name = "gencpp_archive",
     strip_prefix = "gencpp-b41ee3060badd660662e21cd9d4f81971c87a420",
     urls = ["https://github.com/ros/gencpp/archive/b41ee3060badd660662e21cd9d4f81971c87a420.tar.gz"],
     sha256 = "7df31ecc85669d8664339b2eef35d65662315b89da2d8822382533a8e172435c",
@@ -46,6 +48,14 @@ new_http_archive(
     urls = ["https://github.com/ros/std_msgs/archive/474568b32881c81f6fb962a1b45a7d60c4db9255.tar.gz"],
     sha256 = "d39866a32e9d4f4d29276bd1ed7943cb52933c43531910d0c759580d749f9995",
     build_file = "third_party/ros/std_msgs.BUILD"
+)
+
+new_http_archive(
+    name = "ros_comm_msgs",
+    strip_prefix = "ros_comm_msgs-bfb8533fd6c6e959c71f0d2a9669baeff2dac1ad",
+    urls = ["https://github.com/ros/ros_comm_msgs/archive/bfb8533fd6c6e959c71f0d2a9669baeff2dac1ad.tar.gz"],
+    sha256 = "845b32e6ca28bcf3db7c6a29143853d51856280f1f103e913b94401c1d1a15e2",
+    build_file = "third_party/ros/ros_comm_msgs.BUILD"
 )
 
 http_archive(
@@ -72,4 +82,10 @@ http_archive(
         "https://mirror.bazel.build/github.com/gflags/gflags/archive/77592648e3f3be87d6c7123eb81cbad75f9aef5a.tar.gz",
         "https://github.com/gflags/gflags/archive/77592648e3f3be87d6c7123eb81cbad75f9aef5a.tar.gz",
     ],
+)
+
+git_repository(
+    name = "bazel_skylib",
+    remote = "https://github.com/bazelbuild/bazel-skylib.git",
+    tag = "0.3.1",
 )
