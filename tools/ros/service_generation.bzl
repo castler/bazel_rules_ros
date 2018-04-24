@@ -1,10 +1,9 @@
 
 load("@bazel_skylib//:lib.bzl", "paths")
+load("@bazel_ros//tools/ros:message_generation.bzl", "RosGenProvider")
 
-RosGenProvider = provider()
-
-def _genmsg_outs(srcs, ros_package_name, extension):
-    """ Given a list of *.msg files, return the expected paths
+def _gensrv_outs(srcs, ros_package_name, extension):
+    """ Given a list of *.srv files, return the expected paths
     to the generated code with that extension. """
 
     (extension in ['.py', '.h']
@@ -12,29 +11,35 @@ def _genmsg_outs(srcs, ros_package_name, extension):
 
     msg_names = []
     for item in srcs:
-        if not item.endswith('.msg'):
-            fail('%s does not end in .msg' % item)
-        item_name = paths.basename(item)[:-len('.msg')]
+        if not item.endswith('.srv'):
+            fail('%s does not end in .srv' % item)
+        item_name = paths.basename(item)[:-len('.srv')]
 
         if extension == '.py':
             item_name = '_' + item_name
 
         msg_names.append(item_name)
 
-    outs = [
-        paths.join(ros_package_name, msg_name + extension)
-        for msg_name in msg_names
-    ]
+    outs = []
+    res ="Response"
+    req ="Request"
+    for msg_name in msg_names:
+        outs.append(paths.join(ros_package_name, msg_name + extension))
+        outs.append(paths.join(ros_package_name, msg_name + res + extension))
+        outs.append(paths.join(ros_package_name, msg_name + req + extension))
+
 
     if extension == '.py':
         outs += [
+            paths.join(ros_package_name, 'srv', '__init__.py'),
             paths.join(ros_package_name, '__init__.py'),
-        ]
 
+        ]
     return outs
 
+
 def _gencpp_impl(ctx):
-    """Implementation for the genpy rule. Shells out to the scripts
+    """Implementation for the genpy rule. Shells outd to the scripts
     shipped with genpy."""
 
     srcpath = ctx.files.srcs[0].dirname
@@ -47,32 +52,39 @@ def _gencpp_impl(ctx):
         dep_flags.append('-I')
         dep_flags.append('%s:%s' % (dep[RosGenProvider].package_name ,dep[RosGenProvider].srcs[0].dirname))
 
+
     # Generate the actual messages
-    for i in range(len(ctx.outputs.outs)):
+    for i in range(len(ctx.files.srcs)):
+        outshihi = _gensrv_outs([ctx.files.srcs[i].path], ctx.attr.ros_package_name, '.h')
+        realout = []
+        for j in range(len(ctx.outputs.outs)):
+            for a in range(len(outshihi)):
+              if outshihi[a] in ctx.outputs.outs[j].path:
+                realout.append(ctx.outputs.outs[j])
+
         ctx.action(
-        inputs = [ctx.files.srcs[i]] + dep_srcs + ctx.files.srcs,
-        outputs = [ctx.outputs.outs[i]],
-	      executable = ctx.executable._gen_script,
-        arguments = [
-            '-o', outpath,
-            '-p', ctx.attr.ros_package_name, # Include path for the current package
-            '-I', '%s:%s' % (ctx.attr.ros_package_name, srcpath),
-            '-e', '%s' % (ctx.executable._gen_script.dirname+"/gencpp_runner.runfiles/gencpp_archive/scripts"),
-        ] + dep_flags + [
-           ctx.files.srcs[i].path
-        ],
+            inputs= dep_srcs + ctx.files.srcs,
+            outputs=realout,
+            executable=ctx.executable._gen_script,
+            arguments=[
+                '-o', outpath,
+                '-p', ctx.attr.ros_package_name,
+                '-I', '%s:%s' % (ctx.attr.ros_package_name, srcpath), # Include path for the current package
+                '-e', '%s' % (ctx.executable._gen_script.dirname+"/gencpp_runner.runfiles/gencpp_archive/scripts"),
+            ] + dep_flags + [
+    	          ctx.files.srcs[i].path
+            ],
         )
 
     return [RosGenProvider(package_name=ctx.attr.ros_package_name, srcs=ctx.files.srcs)]
 
-
-_genpy = rule(
-    implementation = _gencpp_impl,
-    output_to_genfiles = True,
-    attrs = {
+_gensrv = rule(
+    implementation=_gencpp_impl,
+    output_to_genfiles=True,
+    attrs={
         'srcs': attr.label_list(allow_files=True),
         'ros_package_name': attr.string(),
-        'deps': attr.label_list(allow_empty=True),
+        'deps' : attr.label_list(allow_empty=True),
         '_gen_script': attr.label(
             default=Label('@gencpp_archive//:gencpp_runner'),
             executable=True,
@@ -81,11 +93,11 @@ _genpy = rule(
     },
 )
 
-def generate_messages(name,
+def generate_services(name,
                       srcs=None,
                       ros_package_name=None,
                       deps=None,
-                      ):
+                     ):
     """ Wraps all message generation functionality. Uses the _genpy
     and _gencpp to shell out to the code generation scripts, then wraps
     the resulting files into Python and C++ libraries.
@@ -93,11 +105,11 @@ def generate_messages(name,
     files. """
 
     if not srcs:
-        fail('srcs is required (*.msg files).')
+        fail('srcs is required (*.srv files).')
     if not ros_package_name:
         fail('ros_package_name is required.')
 
-    outs = _genmsg_outs(srcs, ros_package_name, '.h')
+    outs = _gensrv_outs(srcs, ros_package_name, '.h')
 
     gen_dep = []
     if deps:
@@ -108,7 +120,7 @@ def generate_messages(name,
     if deps:
         cc_dep = deps
 
-    _genpy(
+    _gensrv(
         name = name+'_gencppout',
         srcs = srcs,
         ros_package_name = ros_package_name,
@@ -116,9 +128,9 @@ def generate_messages(name,
         deps = gen_dep,
     )
 
-    return native.cc_library(
+    native.cc_library(
         name = name,
         hdrs = outs,
         deps = cc_dep,
-        includes = [""]
+        includes = [""],
     )

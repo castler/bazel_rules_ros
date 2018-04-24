@@ -1,4 +1,5 @@
 load("@bazel_ros//tools/ros:message_generation.bzl", "generate_messages")
+load("@bazel_ros//tools/ros:service_generation.bzl", "generate_services")
 
 # Depends on roscpp_core
 cc_library(
@@ -17,7 +18,8 @@ cc_library(
         "@boost//:thread",
         "@boost//:scope_exit",
         "@ros_comm_msgs//:builtin_ros_comm_msgs",
-        ":builtin_ros_comm_msgs_whatever"
+        ":builtin_ros_comm_msgs_whatever",
+        ":builtin_ros_comm_srvs"
     ],
     visibility = ["//visibility:public"],
 )
@@ -67,4 +69,11 @@ generate_messages(
     name = "builtin_ros_comm_msgs_whatever",
     srcs = glob(["clients/roscpp/msg/*.msg"]),
     ros_package_name = "roscpp",
+)
+
+generate_services(
+    name = "builtin_ros_comm_srvs",
+    srcs = glob(["clients/roscpp/srv/*.srv"]),
+    ros_package_name = "roscpp",
+    deps = ['@ros_comm//:builtin_ros_comm_msgs_whatever'],
 )
