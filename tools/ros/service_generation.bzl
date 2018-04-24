@@ -70,7 +70,7 @@ def _gencpp_impl(ctx):
                 '-o', outpath,
                 '-p', ctx.attr.ros_package_name,
                 '-I', '%s:%s' % (ctx.attr.ros_package_name, srcpath), # Include path for the current package
-                '-e', '%s' % (ctx.executable._gen_script.dirname+"/gencpp_runner.runfiles/gencpp_archive/scripts"),
+#                '-e', '%s' % (ctx.executable._gen_script.dirname+"/gencpp_runner.runfiles/gencpp_archive/scripts"),
             ] + dep_flags + [
     	          ctx.files.srcs[i].path
             ],
