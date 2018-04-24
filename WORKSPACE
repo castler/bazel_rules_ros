@@ -47,7 +47,7 @@ new_http_archive(
     strip_prefix = "std_msgs-474568b32881c81f6fb962a1b45a7d60c4db9255",
     urls = ["https://github.com/ros/std_msgs/archive/474568b32881c81f6fb962a1b45a7d60c4db9255.tar.gz"],
     sha256 = "d39866a32e9d4f4d29276bd1ed7943cb52933c43531910d0c759580d749f9995",
-    build_file = "third_party/ros/std_msgs.BUILD"
+    build_file = "third_party/ros/std_msgs.BUILD",
 )
 
 new_http_archive(
@@ -55,7 +55,15 @@ new_http_archive(
     strip_prefix = "ros_comm_msgs-bfb8533fd6c6e959c71f0d2a9669baeff2dac1ad",
     urls = ["https://github.com/ros/ros_comm_msgs/archive/bfb8533fd6c6e959c71f0d2a9669baeff2dac1ad.tar.gz"],
     sha256 = "845b32e6ca28bcf3db7c6a29143853d51856280f1f103e913b94401c1d1a15e2",
-    build_file = "third_party/ros/ros_comm_msgs.BUILD"
+    build_file = "third_party/ros/ros_comm_msgs.BUILD",
+)
+
+new_http_archive(
+    name = "console_bridge",
+    strip_prefix = "console_bridge-c227ae01ce16d73facb477644d9c25a5ddb166fa",
+    urls = ["https://github.com/ros/console_bridge/archive/c227ae01ce16d73facb477644d9c25a5ddb166fa.tar.gz"],
+    sha256 = "7457472a815020bd072505b928dbca0a828fb188fd5c98a4d492322b413870b0",
+    build_file = "third_party/ros/console_bridge.BUILD",
 )
 
 http_archive(
