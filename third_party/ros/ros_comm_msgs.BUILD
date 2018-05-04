@@ -1,4 +1,4 @@
-load("@bazel_ros//tools/ros:message_generation.bzl", "generate_messages")
+load("@rules_ros//tools/ros:message_generation.bzl", "generate_messages")
 
 package(
     default_visibility = ["//visibility:public"],

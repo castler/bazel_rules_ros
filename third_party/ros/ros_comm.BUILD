@@ -1,5 +1,5 @@
-load("@bazel_ros//tools/ros:message_generation.bzl", "generate_messages")
-load("@bazel_ros//tools/ros:service_generation.bzl", "generate_services")
+load("@rules_ros//tools/ros:message_generation.bzl", "generate_messages")
+load("@rules_ros//tools/ros:service_generation.bzl", "generate_services")
 
 # Depends on roscpp_core
 cc_library(

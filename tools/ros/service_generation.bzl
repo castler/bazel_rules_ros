@@ -1,6 +1,6 @@
 
 load("@bazel_skylib//:lib.bzl", "paths")
-load("@bazel_ros//tools/ros:message_generation.bzl", "RosGenProvider")
+load("@rules_ros//tools/ros:message_generation.bzl", "RosGenProvider")
 
 def _gensrv_outs(srcs, ros_package_name, extension):
     """ Given a list of *.srv files, return the expected paths
